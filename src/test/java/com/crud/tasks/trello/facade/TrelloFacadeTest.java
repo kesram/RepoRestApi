@@ -13,7 +13,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 
@@ -98,5 +100,51 @@ public class TrelloFacadeTest {
                 Assertions.assertThat(trelloListDto.isClosed()).isFalse();
             });
         });
+    }
+
+    @Test
+    public void shouldCreateCard(){
+
+        //Given
+        TrelloCardDto trelloCardDto = new TrelloCardDto("name","desc","pos","1");
+        TrelloCard trelloCard = new TrelloCard("name","desc","pos","1");
+        TrelloDto trelloDto = new TrelloDto(1,1);
+        AttachmentsByTypeDto attachmentsByTypeDto = new AttachmentsByTypeDto(trelloDto);
+        BadgesDto badgesDto = new BadgesDto(1,attachmentsByTypeDto);
+        CreatedTrelloCardDto createdTrelloCardDto = new CreatedTrelloCardDto("1","nameCard","shortUrl",badgesDto);
+
+        when(trelloMapper.mapToCard(trelloCardDto)).thenReturn(trelloCard);
+        when(trelloMapper.mapToCardDto(trelloCard)).thenReturn(trelloCardDto);
+        when(trelloService.createTrelloCard(trelloCardDto)).thenReturn(createdTrelloCardDto);
+        //When
+        CreatedTrelloCardDto createdTrelloCardDto1 = trelloFacade.createCard(trelloCardDto);
+        //Then
+        assertThat(createdTrelloCardDto1.getId()).isEqualTo("1");
+        assertThat(createdTrelloCardDto1.getName()).isEqualTo("nameCard");
+        assertThat(createdTrelloCardDto1.getShortUrl()).isEqualTo("shortUrl");
+        assertThat(createdTrelloCardDto1.getBadges().getVotes()).isEqualTo(1);
+        assertThat(createdTrelloCardDto1.getBadges().getAttachments().getTrello().getBoard()).isEqualTo(1);
+        assertThat(createdTrelloCardDto1.getBadges().getAttachments().getTrello().getCard()).isEqualTo(1);
+        verify(trelloValidator).validateCard(trelloCard);
+
+//        //Given
+//        TrelloCardDto trelloCardDto =
+//                new TrelloCardDto("cardName", "cardDescription", "cardPosition", "1");
+//        TrelloCard trelloCard =
+//                new TrelloCard("cardName", "cardDescription", "cardPosition", "1");
+//        CreatedTrelloCardDto createdTrelloCardDto =
+//                new CreatedTrelloCardDto("1","createdCard","shortURLTest");
+//
+//        when(trelloMapper.mapToCard(trelloCardDto)).thenReturn(trelloCard);
+//        when(trelloMapper.mapToCardDto(trelloCard)).thenReturn(trelloCardDto);
+//        when(trelloService.createTrelloCard(trelloCardDto)).thenReturn(createdTrelloCardDto);
+//        //When
+//        CreatedTrelloCardDto createdTrelloCardDto1 = trelloFacade.createCard(trelloCardDto);
+//        //Then
+//        Assertions.assertThat(createdTrelloCardDto).isNotNull();
+//        Assertions.assertThat(createdTrelloCardDto1.getId()).isEqualTo("1");
+//        Assertions.assertThat(createdTrelloCardDto1.getName()).isEqualTo("createdCard");
+//        Assertions.assertThat(createdTrelloCardDto1.getShortUrl()).isEqualTo("shortURLTest");
+//        verify(trelloValidator).validateCard(trelloCard);
     }
 }

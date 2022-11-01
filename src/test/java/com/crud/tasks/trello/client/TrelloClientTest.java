@@ -1,5 +1,6 @@
 package com.crud.tasks.trello.client;
 
+import com.crud.tasks.domain.BadgesDto;
 import com.crud.tasks.domain.CreatedTrelloCardDto;
 import com.crud.tasks.domain.TrelloBoardDto;
 import com.crud.tasks.domain.TrelloCardDto;
@@ -75,7 +76,7 @@ class TrelloClientTest {
         CreatedTrelloCardDto createdTrelloCardDto = new CreatedTrelloCardDto(
                 "1",
                 "Test task",
-                "http://test.com"
+                "http://test.com",new BadgesDto()
         );
 
         when(restTemplate.postForObject(uri, null, CreatedTrelloCardDto.class)).thenReturn(createdTrelloCardDto);
